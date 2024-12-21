@@ -65,7 +65,6 @@ class NDgame():
         current_choices = [0 for i in range(dim)]
         
         while pointer < len(current_choices):
-            print(current_choices)
             # enumerate a line
             line = []
             
@@ -143,6 +142,8 @@ class NDgame():
         
     # returns true if a player has just made 'dim' in a row, false otherwise
     def is_win(self, coord):
+        if self.moves_played < 2 * self.width - 1:
+            return False
         lines = self.lines_through_coord(coord)
         return self.win_through_lines(lines)
     
@@ -159,6 +160,11 @@ class NDgame():
             return 0.5
         return -1
     
+    def reset(self):
+        self.board = self.create_board(self.dim, self.width)
+        self.moves_played = 0
+        self.move_list = []
+    
     # returns the board in string representation 
     def __str__(self):
         return str(self.board)   
@@ -171,8 +177,8 @@ if __name__ == "__main__":
     game.set_square_val((0,1,2),1)
     print(game.get_square_val((0,1,2)))
     print(game.get_random_move())'''
-    game.play_move((1,1), 1)
+    '''game.play_move((1,1), 1)
     game.play_move((0,1), 1)
     game.play_move((2,1), 1)
     print(game)
-    print(game.win_through_lines(game.lines_through_coord((1,1))))
+    print(game.win_through_lines(game.lines_through_coord((1,1))))'''
