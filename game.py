@@ -1,5 +1,5 @@
 import random
-
+from collections import defaultdict
 # Class representing a tic tac toe board of arbitrary width and dimension
 
 class NDgame():
@@ -11,6 +11,16 @@ class NDgame():
         self.winning_lines = self.enumerate_lines(dim, width)
         self.squares = width ** dim
         
+        self.points = self.enumerate_points(dim, width)
+        # caching saves time when playing 100s of games in higher dimensions
+        self.points_to_lines = {}
+        for p in self.points:
+            for line in self.winning_lines:
+                if p in line:
+                    if p not in self.points_to_lines:
+                        self.points_to_lines[p] = []
+                    self.points_to_lines[p].append(line)
+                    
         self.moves_played = 0
         self.move_list = []
     
@@ -22,6 +32,19 @@ class NDgame():
             return [0 for i in range(width)]
         else:
             return [self.create_board(dim - 1, width) for i in range(width)]
+        
+    def enumerate_points(self, dim, width):
+        coords = []
+        curr = [0 for i in range(dim)]
+        for i in range(width ** dim):
+            coords.append(tuple(i for i in curr))
+            if i != (width ** dim) - 1:
+                pointer = 0
+                while curr[pointer] == width - 1:
+                    curr[pointer] = 0
+                    pointer += 1
+                curr[pointer] += 1
+        return coords
     
     # returns the value of a square on the board
     def get_square_val(self, coord):
@@ -47,11 +70,13 @@ class NDgame():
     def lines_through_coord(self, coord):
         if len(coord) != self.dim:
             raise Exception("coord is the wrong length")
-        lines = []
+        '''lines = []
         for line in self.winning_lines:
             if coord in line:
                 lines.append(line)
-        return lines
+        return lines'''
+        
+        return self.points_to_lines[coord]
     
     # enumerates all winning lines - that is, all lines of length 'dim'
     def enumerate_lines(self, dim, width):
@@ -75,7 +100,7 @@ class NDgame():
                     for j in range(width):
                         x = tuple(coord if coord < width else (j if coord == width else width - 1 - j) for coord in current_choices)
                         line.append(x)
-                    winning_lines.append(line)
+                    winning_lines.append(tuple(line))
             
             # increment pointer
             while pointer < len(current_choices) and current_choices[pointer] == width + 1:
@@ -89,7 +114,8 @@ class NDgame():
         return winning_lines
        
     # returns true if any of a collection of lines contains all of one mark (either X or O)
-    def win_through_lines(self, lines):
+    def win_through_lines(self, lines, coord):
+        
         for line in lines:
             mark = self.get_square_val(line[0])
             is_win = True
@@ -145,7 +171,7 @@ class NDgame():
         if self.moves_played < 2 * self.width - 1:
             return False
         lines = self.lines_through_coord(coord)
-        return self.win_through_lines(lines)
+        return self.win_through_lines(lines, coord)
     
     # returns -1 if game is ongoing, 1 for X win, 0 for O win, 0.5 for tie
     def game_result(self, coord, mark):
@@ -160,19 +186,32 @@ class NDgame():
             return 0.5
         return -1
     
+    # resets the game
     def reset(self):
         self.board = self.create_board(self.dim, self.width)
         self.moves_played = 0
         self.move_list = []
-    
+        self.win_dict = {line : [0,0] for line in self.winning_lines}
+
     # returns the board in string representation 
     def __str__(self):
         return str(self.board)   
     
 if __name__ == "__main__":
     game = NDgame(2,3)
-    '''print(len(game.winning_lines))
-    print(len(game.lines_through_coord((0,0,0))))
+    
+    lines = game.lines_through_coord((1,1))
+    
+    game.play_move((1,1), 1)
+    game.play_move((1,0), 1)
+    game.play_move((1,2), 1)
+    
+    print(game.win_dict)
+
+    
+    print(game.win_through_lines(lines, (1,1)))
+    
+    '''print(len(game.lines_through_coord((0,0,0))))
     print(game.get_square_val((0,1,2)))
     game.set_square_val((0,1,2),1)
     print(game.get_square_val((0,1,2)))
