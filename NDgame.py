@@ -1,3 +1,5 @@
+import random
+
 # Class representing a tic tac toe board of arbitrary width and dimension
 
 class NDgame():
@@ -109,6 +111,25 @@ class NDgame():
         moves = []
         coord = [0 for i in range(self.dim)]
         
+        for i in range(self.squares):
+            pointer = 0
+            if self.is_legal(coord):
+                moves.append(tuple(coord))
+                
+            # incrememt coordinate
+            if i != self.squares - 1:
+                while coord[pointer] == self.width - 1:
+                    coord[pointer] = 0
+                    pointer += 1
+                coord[pointer] += 1
+        
+        return moves
+    
+    # returns a random legal move
+    def get_random_move(self):
+        moves = self.get_legal_moves()
+        return random.choice(moves)
+        
     # returns true if a player has just made 'dim' in a row, false otherwise
     def is_win(self, coord):
         lines = self.lines_through_coord(coord)
@@ -137,6 +158,7 @@ print(len(game.lines_through_coord((0,0,0))))
 '''print(game.get_square_val((0,1,2)))
 game.set_square_val((0,1,2),1)
 print(game.get_square_val((0,1,2)))'''
+print(game.get_random_move())
 
     
             
