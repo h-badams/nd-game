@@ -69,7 +69,8 @@ class NDgame():
             
             if width in current_choices or width + 1 in current_choices:
                 if width in current_choices and (
-                    width + 1 not in current_choices or current_choices.index(width) < current_choices.index(width + 1)):
+                    width + 1 not in current_choices or (
+                        current_choices.index(width) < current_choices.index(width + 1))):
                     for j in range(width):
                         x = tuple(coord if coord < width else 
                                 (j if coord == width else len(current_choices) - 1 - j) for coord in current_choices)
@@ -106,7 +107,7 @@ class NDgame():
             return True
         return False
     
-    # TODO implement method
+    # returns a list of legal moves
     def get_legal_moves(self):
         moves = []
         coord = [0 for i in range(self.dim)]
