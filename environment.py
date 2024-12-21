@@ -6,6 +6,9 @@ class Environment():
         
     # runs a game between two agents, and returns the result - 1, 0, or 0.5 for the first player
     def run(self, agent_list, display_end=False, print_moves=False):
+        
+        self.game.reset()
+        
         turn = 0
         i = 0
         
@@ -19,8 +22,7 @@ class Environment():
                     print(move)
             else:
                 raise Exception("illegal move by player {i}")
-            #print("game board:", self.game)
-            #print("game result:", self.game.game_result(move, i + 1))
+
             if self.game.game_result(move, i+1) != -1:
                 if display_end:
                     print("final game state: ", self.game)
