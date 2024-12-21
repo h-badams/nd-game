@@ -3,9 +3,12 @@ import environment
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+import time
 
 # histogram for win rates in higher dimensions when both players play randomly
 # warning: this takes a long time
+
+start_time = time.time()
 
 def agent_random(obs, config):
     moves = obs[3]
@@ -25,13 +28,16 @@ if __name__ == "__main__":
         for j in n:
             g = game.NDgame(i,j)
             env = environment.Environment(g)
+            average_length = 0
             for k in range(trials):
-                result = env.run([agent_random, agent_random])
+                result, turns = env.run([agent_random, agent_random], return_move_num=True)
+                average_length += turns / 100.0
                 if result == 1:
                     heights[j-2][i-2] += 1
                 if k == trials - 1:
-                    print(f"finished n={j}, d={i}")
+                    print(f"finished n={j}, d={i}, average length = {average_length}")
         
+    print("--- %s seconds ---" % (time.time() - start_time))
     
     heights = np.array(heights)
     
