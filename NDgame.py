@@ -98,15 +98,31 @@ class NDgame():
                 return True
         return False
 
+    # returns true for an empty square's coordinates, false otherwise
+    def is_legal(self, coord):
+        if self.get_square_val(coord) == 0:
+            return True
+        return False
+    
+    # TODO implement method
+    def get_legal_moves(self):
+        moves = []
+        coord = [0 for i in range(self.dim)]
+        
     # returns true if a player has just made 'dim' in a row, false otherwise
     def is_win(self, coord):
         lines = self.lines_through_coord(coord)
         return self.win_through_lines(lines)
     
     # returns -1 if game is ongoing, 1 for X win, 0 for O win, 0.5 for tie
-    def game_result(self, coord):
+    def game_result(self, coord, mark):
         if self.is_win(coord):
-            pass
+            if mark == 1:
+                return 1
+            if mark == 2:
+                return 0
+            else:
+                raise Exception("invalid mark!")
         elif self.moves_played == self.squares:
             return 0.5
         return -1
