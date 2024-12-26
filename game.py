@@ -1,5 +1,5 @@
 import random
-from collections import defaultdict
+
 # Class representing a tic tac toe board of arbitrary width and dimension
 
 class NDgame():

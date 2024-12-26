@@ -14,7 +14,7 @@ class Environment():
         
         while True:
             move = agent_list[i]((self.game.board, i+1, turn, self.game.get_legal_moves()), (
-                self.game.width, self.game.dim))
+                self.game.dim, self.game.width))
             if self.game.is_legal(move):
                 self.game.play_move(move, i+1)
                 self.game.move_list.append(move)

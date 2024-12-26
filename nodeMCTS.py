@@ -61,20 +61,20 @@ class Node:
         if self.done:
             return
     
-        actions = self.env.get_legal_moves()
+        actions = self.env.game.get_legal_moves()
         children = []
         
         for i in range(len(actions)):
             # TODO change self.done to what it should be
             # TODO currently I believe all the moves are being played as one mark or the other - this needs to be fixed
             new_env = copy.deepcopy(self.env)
-            new_env.play_move(actions[i], self.turn_to_mark())
+            new_env.game.play_move(actions[i], self.turn_to_mark())
             
             if actions is None or actions[i] is None:
                 raise Exception("actions i should never be none")
             
             new_done = False
-            if new_env.is_winner(actions[i]) or new_env.is_tie():
+            if new_env.game.is_winner(actions[i]) or new_env.game.is_tie():
                 new_done = True
         
             children.append(Node(new_env, new_done, self, self.player_mark, not self.is_player_turn, action_played=actions[i]))
@@ -97,7 +97,7 @@ class Node:
         # either rollout or create children / expand
         
         if current.done:
-            result = current.env.get_winner(current.action_played)
+            result = current.env.game.get_winner(current.action_played)
             if result == self.player_mark:
                 current.T += 1
             elif result == 0:
@@ -111,7 +111,7 @@ class Node:
             # pasting the same code block but I'll figure out
             # a better solution later
             if current.done:
-                result = current.env.get_winner(current.action_played)
+                result = current.env.game.get_winner(current.action_played)
                 if result == self.player_mark:
                     current.T += 1
                 elif result == 0:
