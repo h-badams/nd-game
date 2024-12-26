@@ -1,4 +1,6 @@
-import environment, nodeMCTS
+import game
+import environment
+import nodeMCTS
 
 # MCTS agent that stores tree information
 
@@ -16,13 +18,13 @@ class Agent:
         
         self.current_state = current_state
         
-        self.explore_const = 1000
+        self.explore_const = 100
     
     def agent_mcts(self, obs, config):
         # if first time called, get the starting state and make a node
         if self.current_tree is None or obs[2] == 0 or obs[2] == 1:
-            int_env = environment.Environment(config[0],config[1])
-            int_env.board = obs[0]
+            int_env = environment.Environment(game.NDgame(config[0],config[1]))
+            int_env.game.board = obs[0]
             self.current_tree = nodeMCTS.Node(int_env, False, None, obs[1], True)
             self.current_state = obs[0]
         # if not, then figure out what the last move was and
@@ -51,5 +53,5 @@ class Agent:
     # chooses move opponent made in tree
     def get_next_node(self, current_board):
         for child in self.current_tree.children:
-            if child.env.board == current_board:
+            if child.env.game.board == current_board:
                 return child
