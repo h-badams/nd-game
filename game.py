@@ -70,11 +70,6 @@ class NDgame():
     def lines_through_coord(self, coord):
         if len(coord) != self.dim:
             raise Exception("coord is the wrong length")
-        '''lines = []
-        for line in self.winning_lines:
-            if coord in line:
-                lines.append(line)
-        return lines'''
         
         return self.points_to_lines[coord]
     
@@ -174,13 +169,14 @@ class NDgame():
         return self.win_through_lines(lines, coord)
     
     # returns -1 if game is ongoing, 1 for X win, 0 for O win, 0.5 for tie
-    def game_result(self, coord, mark):
+    def game_result(self, coord):
+        mark = self.get_square_val(coord)
         if self.is_win(coord):
             if mark == 1:
                 return 1
             if mark == 2:
                 return 0
-            else:
+            elif mark != 0:
                 raise Exception("invalid mark!")
         elif self.moves_played == self.squares:
             return 0.5
@@ -197,6 +193,13 @@ class NDgame():
     def __str__(self):
         return str(self.board)   
     
+    def print_board(self):
+        if self.dim != 2:
+            print(self)
+        else:
+            for row in self.board:
+                print(*row)
+    
 if __name__ == "__main__":
     game = NDgame(2,3)
     
@@ -205,10 +208,7 @@ if __name__ == "__main__":
     game.play_move((1,1), 1)
     game.play_move((1,0), 1)
     game.play_move((1,2), 1)
-    
-    print(game.win_dict)
 
-    
     print(game.win_through_lines(lines, (1,1)))
     
     '''print(len(game.lines_through_coord((0,0,0))))
