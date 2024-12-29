@@ -18,14 +18,15 @@ class Agent:
         
         self.current_state = current_state
         
-        self.explore_const = 100
+        self.explore_const = 20
     
     def agent_mcts(self, obs, config):
         # if first time called, get the starting state and make a node
         if self.current_tree is None or obs[2] == 0 or obs[2] == 1:
             int_env = environment.Environment(game.NDgame(config[0],config[1]))
             int_env.game.board = obs[0]
-            self.current_tree = nodeMCTS.Node(int_env, False, None, obs[1], True)
+            mark = obs[1]
+            self.current_tree = nodeMCTS.Node(mark, int_env, done=False, is_player_turn=True, parent=None)
             self.current_state = obs[0]
         # if not, then figure out what the last move was and
         # prune your previous tree
@@ -34,7 +35,7 @@ class Agent:
             
             if new_top is None:
                 raise Exception(f"didn't find opponent's move in tree!")
-            if not new_top.is_player_turn: # for testing purposed right now
+            if not new_top.is_player_turn: # for testing purposes right now
                 raise Exception("New node not player's turn - something is wrong")
             new_top.detach()
             self.current_tree = new_top

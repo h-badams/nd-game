@@ -29,11 +29,13 @@ def agent_player(obs, config):
             
     return tuple(move)
             
-
 game = game.NDgame(2,3)
 env = environment.Environment(game)
 
 a = agentMCTS.Agent()
+
+env.run([a.agent_mcts, agent_random], display_end=True)
+env.run([a.agent_mcts, agent_random], display_end=True)
 
 env.run([a.agent_mcts, agent_random], display_end=True)
 
