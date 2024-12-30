@@ -132,6 +132,7 @@ class NDgame():
         if self.is_legal(coord):
             self.set_square_val(coord, mark)
             self.moves_played += 1
+            self.move_list.append(coord)
         else:
             raise Exception("can't play - illegal move!")
     
@@ -163,8 +164,8 @@ class NDgame():
         
     # returns true if a player has just made 'dim' in a row, false otherwise
     def is_win(self, coord):
-        if self.moves_played < 2 * self.width - 1:
-            return False
+        '''if self.moves_played < 2 * self.width - 1:
+            return False'''
         lines = self.lines_through_coord(coord)
         return self.win_through_lines(lines, coord)
     
@@ -179,15 +180,21 @@ class NDgame():
             elif mark != 0:
                 raise Exception("invalid mark!")
         elif self.moves_played == self.squares:
+            # TODO the issue is partially here, I think
             return 0.5
         return -1
+    
+    # TODO implement
+    # it seems like the easy way to do this may be buggy
+    # trying the verbose implementation to see if it fixes things
+    def board_is_full():
+        pass
     
     # resets the game
     def reset(self):
         self.board = self.create_board(self.dim, self.width)
         self.moves_played = 0
         self.move_list = []
-        self.win_dict = {line : [0,0] for line in self.winning_lines}
 
     # returns the board in string representation 
     def __str__(self):
