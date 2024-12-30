@@ -4,55 +4,65 @@ import nodeMCTS
 
 # MCTS agent that stores tree information
 
-'''
-Want to try and make this as formal and abstract as possible
-(so that this code works in a very general case)
-The agent gets a game that has a current state - agent then
-builds a tree w/ MCTS, picks the best move, and repeats
-'''
-
-class Agent:
-    def __init__(self, current_tree=None, current_state=None):        
-        # a node with the game state should be passed in
-        self.current_tree = current_tree
-        
-        self.current_state = current_state
-        
-        self.explore_const = 20
+class Agent():
+    def __init__(self, explore_const=5):
+        self.tree = None
+        self.explore_const = explore_const
     
     def agent_mcts(self, obs, config):
-        # if first time called, get the starting state and make a node
-        if self.current_tree is None or obs[2] == 0 or obs[2] == 1:
-            int_env = environment.Environment(game.NDgame(config[0],config[1]))
-            int_env.game.board = obs[0]
-            mark = obs[1]
-            self.current_tree = nodeMCTS.Node(mark, int_env, done=False, is_player_turn=True, parent=None)
-            self.current_state = obs[0]
-        # if not, then figure out what the last move was and
-        # prune your previous tree
-        else:
-            new_top = self.get_next_node(obs[0])
+        current_board = obs[0]
+        agent_mark = obs[1]
+        current_turn = obs[2]
+        
+        dim, width = config
+        
+        # if starting a new game, make a new game tree with the current position
+        if current_turn <= 1:
+            g = game.NDgame(dim, width)
+            int_env = environment.Environment(g)
+            our_turn = True
+            if current_turn == 1:
+                our_turn = False
+            self.tree = nodeMCTS.Node(agent_mark, int_env, done=False, is_player_turn=our_turn, parent=None)
+        
+        # determine the opponent's move with respect to previous game tree
+        self.update_tree_from_opponent_move(current_board)
+        
+        if self.tree.is_player_turn == False:
+            raise Exception("it isn't our turn")
+        
+        # do some number of explores
+        for _ in range(self.explore_const):
+            self.tree.explore()
             
-            if new_top is None:
-                raise Exception(f"didn't find opponent's move in tree!")
-            if not new_top.is_player_turn: # for testing purposes right now
-                raise Exception("New node not player's turn - something is wrong")
-            new_top.detach()
-            self.current_tree = new_top
-        
-        for i in range(self.explore_const):
-            self.current_tree.explore()
-        
-        next_top, next_move = self.current_tree.next()
-        
-        if not next_top.done: # wait, why do we need this check?
-            next_top.detach()
-            self.current_tree = next_top
+        # pick the most visited node, and make that one the top node by deleting its parent
+        next_top, next_move = self.tree.next()
+            
+        next_top.detach()
+        self.tree = next_top
         
         return next_move
     
-    # chooses move opponent made in tree
-    def get_next_node(self, current_board):
-        for child in self.current_tree.children:
+    # TODO method comment
+    def update_tree_from_opponent_move(self, current_board):
+        if self.tree.done:
+            raise Exception("don't call this method on a finished game state")
+        
+        if self.tree.env.game.board == current_board:
+            return
+        
+        if not self.tree.children:
+            self.tree.create_children()
+            
+        found_child = False
+        for child in self.tree.children:
             if child.env.game.board == current_board:
-                return child
+                self.tree = child
+                del self.tree.parent
+                self.tree.parent = None
+                found_child = True
+                break
+        
+        if not found_child:
+            raise Exception("current board was not the child of previous game state")
+            

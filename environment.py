@@ -3,28 +3,25 @@
 class Environment():
     def __init__(self, game):
         self.game = game
+        self.turn = game.moves_played
         
     # runs a game between two agents, and returns the result - 1, 0, or 0.5 for the first player
-    def run(self, agent_list, display_end=False, print_moves=False, return_move_num=False, is_rollout=False):
+    def run(self, agent_list, display_end=False, print_moves=False, return_move_num=False, reset_before=False):
         
-        if not is_rollout:
-            self.game.reset()
-            turn = 0
-            i = 0
-        else:
-            turn = self.game.moves_played
-            i = turn % 2
+        if reset_before:
+            self.reset()
         
+        # TODO change this to be safer
         while True:
-            move = agent_list[i]((self.game.board, i+1, turn, self.game.get_legal_moves()), (
+            move = agent_list[self.turn % 2](
+                (self.game.board, turn_to_mark(self.turn), self.turn, self.game.get_legal_moves()), (
                 self.game.dim, self.game.width))
             if self.game.is_legal(move):
-                self.game.play_move(move, i+1)
-                self.game.move_list.append(move)
+                self.play_move(move)
                 if print_moves:
                     print(move)
             else:
-                raise Exception("illegal move by player {i}")
+                raise Exception(f"illegal move by player {turn_to_mark(self.turn)}")
 
             if self.game.game_result(move) != -1:
                 if display_end:
@@ -33,9 +30,19 @@ class Environment():
                     return self.game.game_result(move)
                 else:
                     return self.game.game_result(move), self.game.moves_played
-            
-            i += 1
-            i %= 2
-            turn += 1          
+        
+    # useful to call this instead of the game version    
+    def play_move(self, coord):
+        mark = turn_to_mark(self.turn) 
+        self.game.play_move(coord, mark)
+        self.turn += 1
+        
+    def reset(self):
+        self.game.reset()
+        self.turn = 0
 
-            
+def turn_to_mark(turn):
+    if turn % 2 == 0:
+        return 1
+    else:
+        return 2         

@@ -47,7 +47,7 @@ class Node():
     # 0 for loss, 0.5 for tie
     def rollout(self):
         new_env = copy.deepcopy(self.env)
-        result = new_env.run([agent_random, agent_random], is_rollout=True)
+        result = new_env.run([agent_random, agent_random])
         if result == 0.5:
             return result
         if self.turn_to_mark() == 1:
@@ -72,7 +72,7 @@ class Node():
                 raise Exception("there shouldn't be a null action!")
             
             new_env = copy.deepcopy(self.env)
-            new_env.game.play_move(action, self.turn_to_mark())
+            new_env.play_move(action)
             
             new_done = False
             new_result = None
@@ -177,10 +177,11 @@ class Node():
     
     # TODO method comment
     def detach(self):
-        pass
+        del self.parent
+        self.parent = None
     
     def __str__(self):
-        return f"(N: {self.N}, T: {self.T}, board: {self.env.game.board})"
+        return f"(N: {self.N}, T: {self.T}, board: {self.env.game.board}, action played: {self.action_played}, turn: {self.env.game.moves_played}, result: {self.result})"
     
 # useful for cleanly writing rollout code
 def agent_random(obs, config):
