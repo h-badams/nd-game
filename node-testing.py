@@ -25,18 +25,23 @@ def print_tree(top_node):
                 num_nodes += 1
                 
     print(num_nodes)
+    
+def print_children(top_node):
+    print(top_node)
+    for child in top_node.children:
+        print(child)
 
 g = game.NDgame(3, 3)
 env = environment.Environment(g)
-env.game.play_move((1,1,1), 1)
+# env.game.play_move((1,1,1), 1)
 
-test_node = nodeMCTS.Node(2, env, done=False, is_player_turn=True, 
+test_node = nodeMCTS.Node(1, env, done=False, is_player_turn=True, 
                           parent=None, action_played=None)
 
-for i in range(50):
+for i in range(800):
     test_node.explore()
 
-print_tree(test_node)
-
+# print_tree(test_node)
+print_children(test_node)
 
         
