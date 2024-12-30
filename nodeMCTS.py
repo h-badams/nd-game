@@ -20,21 +20,21 @@ class Node():
         self.result = result # stores the 'objective result' - i.e. it stores 1 iff X wins
                 
         # exploration const - experiment with this
-        self.c = 0.5
+        self.c = 1.41
     
     # TODO method comment
     
     def uct_score(self):
+        sign = 1
+        if not self.is_player_turn:
+            sign *= -1
+        
         if self.N == 0:
             return 1e6
         
         top_node = self
         if self.parent:
             top_node = top_node.parent
-
-        sign = 1
-        if not self.is_player_turn:
-            sign = -1
         
         # flipping the sign of the UCT score on opponent nodes is
         # equivalent to minmaxing when traversing the game tree
@@ -48,8 +48,6 @@ class Node():
     def rollout(self):
         new_env = copy.deepcopy(self.env)
         result = new_env.run([agent_random, agent_random])
-        if result == 0.5:
-            return result
         if self.turn_to_mark() == 1:
             return result
         if self.turn_to_mark() == 2:
